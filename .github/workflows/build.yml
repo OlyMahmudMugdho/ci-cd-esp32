@@ -24,7 +24,7 @@ jobs:
           # Fresh slate config with zero inherited system caching
           mkdir -p ~/.arduino15
           arduino-cli config init --overwrite
-          arduino-cli config set board_manager.additional_urls https://github.io
+          arduino-cli config set board_manager.additional_urls https://espressif.github.io/arduino-esp32/package_esp32_index.json
           
           # Complete board index validation tracking
           arduino-cli core update-index
@@ -38,4 +38,6 @@ jobs:
 
       - name: Compile Sketch
         run: |
-          arduino-cli compile --fqbn esp32:esp32:esp32s3 ./ci-cd-esp32.ino
+          mkdir -p ./sketch
+          cp ./sketch.ino ./sketch/sketch.ino
+          arduino-cli compile --fqbn esp32:esp32:esp32s3 ./sketch
