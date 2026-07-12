@@ -19,13 +19,17 @@ jobs:
 
       - name: Install ESP32 Core
         run: |
-          arduino-cli core update-index --additional-urls https://github.io
-          arduino-cli core install esp32:esp32 --additional-urls https://github.io
+          arduino-cli config init --overwrite
+          arduino-cli config set board_manager.additional_urls https://github.io
+          arduino-cli core update-index
+          arduino-cli core install esp32:esp32
 
       - name: Install Dependencies
         run: |
-          # Example: arduino-cli lib install "WiFiNINA"
-          # Add any required libraries your project uses here
+          # If your sketch requires external libraries, uncomment and add them below:
+          # arduino-cli lib install "PubSubClient"
+          # arduino-cli lib install "ArduinoJson"
+          echo "No external libraries specified."
 
       - name: Compile Sketch
         run: |
