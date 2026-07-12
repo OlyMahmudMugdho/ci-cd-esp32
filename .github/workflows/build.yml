@@ -1,0 +1,32 @@
+name: Compile ESP32-S3 Arduino Sketch
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Arduino CLI
+        uses: arduino/setup-arduino-cli@v2
+
+      - name: Install ESP32 Core
+        run: |
+          arduino-cli core update-index
+          arduino-cli core install esp32:esp32 --additional-urls https://githubusercontent.com
+
+      - name: Install Dependencies
+        run: |
+          # Example: arduino-cli lib install "WiFiNINA"
+          # Add any required libraries your project uses here
+
+      - name: Compile Sketch
+        run: |
+          arduino-cli compile --fqbn esp32:esp32:esp32s3 ./sketch.ino
