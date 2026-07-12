@@ -4,7 +4,7 @@ const int echoPin = 5;
 const int greenLED = 18;
 const int redLED = 7;
 
-const float tankHeight = 40.0;   // cm
+const float tankHeight = 9.0;   // cm
 
 void setup() {
 
