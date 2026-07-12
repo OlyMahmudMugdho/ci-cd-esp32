@@ -41,3 +41,10 @@ jobs:
           mkdir -p ./sketch
           cp ./sketch.ino ./sketch/sketch.ino
           arduino-cli compile --fqbn esp32:esp32:esp32s3 ./sketch
+
+      - name: Upload compiled binaries
+        uses: actions/upload-artifact@v4
+        with:
+          name: esp32-build-output
+          path: |
+            sketch/build/**/*
