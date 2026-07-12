@@ -19,8 +19,8 @@ jobs:
 
       - name: Install ESP32 Core
         run: |
-          arduino-cli core update-index
-          arduino-cli core install esp32:esp32 --additional-urls https://githubusercontent.com
+          arduino-cli core update-index --additional-urls https://github.io
+          arduino-cli core install esp32:esp32 --additional-urls https://github.io
 
       - name: Install Dependencies
         run: |
