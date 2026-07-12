@@ -17,23 +17,24 @@ jobs:
       - name: Setup Arduino CLI
         uses: arduino/setup-arduino-cli@v2
 
-      # We forcefully wipe out any cached directories where the invalid URL is saved
-      - name: Purge Broken CLI Indexes
+      - name: Purge Cache and Force Setup
+        # We enforce a clean workspace and delete any hidden files from previous builds
         run: |
-          rm -rf ~/.arduino15/package_index.json*
-          rm -rf ~/.arduino15/cache/*
+          rm -rf ~/.arduino15
+          mkdir -p ~/.arduino15
+          arduino-cli config init --overwrite
 
-      # We pass the URL cleanly via ARDUINO_BOARD_MANAGER_ADDITIONAL_URLS environment variable
       - name: Install ESP32 Core
+        # Explicit env overrides prevent the tool from pulling down the ghost 'github.io' link
         env:
-          ARDUINO_BOARD_MANAGER_ADDITIONAL_URLS: https://github.io
+          ARDUINO_BOARD_MANAGER_ADDITIONAL_URLS: "https://github.io"
         run: |
           arduino-cli core update-index
           arduino-cli core install esp32:esp32
 
       - name: Install Dependencies
         run: |
-          # If your sketch requires external libraries, uncomment and add them below:
+          # If your sketch requires external libraries, uncomment and add them here:
           # arduino-cli lib install "PubSubClient"
           echo "No external libraries specified."
 
