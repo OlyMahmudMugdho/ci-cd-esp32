@@ -14,30 +14,28 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Install Raw Arduino CLI
+      - name: Install Raw Arduino CLI Global Binary
         run: |
-          curl -fsSL https://githubusercontent.com | sh
-          echo "$GITHUB_WORKSPACE/bin" >> $GITHUB_PATH
+          # Force the installation directly into your system binary folder
+          curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sudo BINDIR=/usr/local/bin sh
 
       - name: Configure and Install ESP32 Core
         run: |
-          # Initialize completely fresh data directories
+          # Fresh slate config with zero inherited system caching
           mkdir -p ~/.arduino15
+          arduino-cli config init --overwrite
+          arduino-cli config set board_manager.additional_urls https://github.io
           
-          # Force exact configurations directly into a newly written file
-          bin/arduino-cli config init --overwrite
-          bin/arduino-cli config set board_manager.additional_urls https://github.io
-          
-          # Execute indexing and downloads without ambient ghost configs
-          bin/arduino-cli core update-index
-          bin/arduino-cli core install esp32:esp32
+          # Complete board index validation tracking
+          arduino-cli core update-index
+          arduino-cli core install esp32:esp32
 
       - name: Install Dependencies
         run: |
           # If your sketch requires external libraries, uncomment below:
-          # bin/arduino-cli lib install "PubSubClient"
+          # arduino-cli lib install "PubSubClient"
           echo "No external libraries specified."
 
       - name: Compile Sketch
         run: |
-          bin/arduino-cli compile --fqbn esp32:esp32:esp32s3 ./ci-cd-esp32.ino
+          arduino-cli compile --fqbn esp32:esp32:esp32s3 ./ci-cd-esp32.ino
