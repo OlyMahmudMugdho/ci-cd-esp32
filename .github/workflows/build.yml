@@ -14,30 +14,30 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Setup Arduino CLI
-        uses: arduino/setup-arduino-cli@v2
-
-      - name: Purge Cache and Force Setup
-        # We enforce a clean workspace and delete any hidden files from previous builds
+      - name: Install Raw Arduino CLI
         run: |
-          rm -rf ~/.arduino15
+          curl -fsSL https://githubusercontent.com | sh
+          echo "$GITHUB_WORKSPACE/bin" >> $GITHUB_PATH
+
+      - name: Configure and Install ESP32 Core
+        run: |
+          # Initialize completely fresh data directories
           mkdir -p ~/.arduino15
-          arduino-cli config init --overwrite
-
-      - name: Install ESP32 Core
-        # Explicit env overrides prevent the tool from pulling down the ghost 'github.io' link
-        env:
-          ARDUINO_BOARD_MANAGER_ADDITIONAL_URLS: "https://github.io"
-        run: |
-          arduino-cli core update-index
-          arduino-cli core install esp32:esp32
+          
+          # Force exact configurations directly into a newly written file
+          bin/arduino-cli config init --overwrite
+          bin/arduino-cli config set board_manager.additional_urls https://github.io
+          
+          # Execute indexing and downloads without ambient ghost configs
+          bin/arduino-cli core update-index
+          bin/arduino-cli core install esp32:esp32
 
       - name: Install Dependencies
         run: |
-          # If your sketch requires external libraries, uncomment and add them here:
-          # arduino-cli lib install "PubSubClient"
+          # If your sketch requires external libraries, uncomment below:
+          # bin/arduino-cli lib install "PubSubClient"
           echo "No external libraries specified."
 
       - name: Compile Sketch
         run: |
-          arduino-cli compile --fqbn esp32:esp32:esp32s3 ./ci-cd-esp32.ino
+          bin/arduino-cli compile --fqbn esp32:esp32:esp32s3 ./ci-cd-esp32.ino
