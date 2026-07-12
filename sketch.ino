@@ -2,7 +2,7 @@ const int trigPin = 4;
 const int echoPin = 5;
 
 const int greenLED = 18;
-const int redLED = 19;
+const int redLED = 7;
 
 const float tankHeight = 40.0;   // cm
 
