@@ -38,4 +38,6 @@ jobs:
 
       - name: Compile Sketch
         run: |
-          arduino-cli compile --fqbn esp32:esp32:esp32s3 ./sketch.ino
+          mkdir -p ./sketch
+          cp ./sketch.ino ./sketch/sketch.ino
+          arduino-cli compile --fqbn esp32:esp32:esp32s3 ./sketch
