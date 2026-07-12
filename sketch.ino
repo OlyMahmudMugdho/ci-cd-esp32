@@ -1,74 +1,49 @@
-const int trigPin = 4;
-const int echoPin = 5;
+name: Compile ESP32-S3 Arduino Sketch
 
-const int greenLED = 18;
-const int redLED = 19;
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
-const float tankHeight = 40.0;   // cm
+jobs:
+  build:
+    runs-on: ubuntu-latest
 
-void setup() {
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-  Serial.begin(115200);
+      - name: Install Arduino CLI
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sudo BINDIR=/usr/local/bin sh
 
-  pinMode(trigPin, OUTPUT);
-  pinMode(echoPin, INPUT);
+      - name: Configure Arduino CLI
+        run: |
+          arduino-cli config init --overwrite
 
-  pinMode(greenLED, OUTPUT);
-  pinMode(redLED, OUTPUT);
-}
+          arduino-cli config add board_manager.additional_urls \
+            https://espressif.github.io/arduino-esp32/package_esp32_index.json
 
-void loop() {
+          arduino-cli core update-index
+          arduino-cli core install esp32:esp32
 
-  digitalWrite(trigPin, LOW);
-  delayMicroseconds(2);
+      - name: Install Libraries
+        run: |
+          # Install required libraries here if needed.
+          # Example:
+          # arduino-cli lib install "PubSubClient"
+          echo "No external libraries specified."
 
-  digitalWrite(trigPin, HIGH);
-  delayMicroseconds(10);
+      - name: Show Arduino CLI Info
+        run: |
+          arduino-cli version
+          arduino-cli board listall | grep esp32 || true
 
-  digitalWrite(trigPin, LOW);
-
-  long duration = pulseIn(echoPin, HIGH);
-
-  float distance = duration * 0.0343 / 2.0;
-
-  float waterHeight = tankHeight - distance;
-
-  if (waterHeight < 0)
-    waterHeight = 0;
-
-  if (waterHeight > tankHeight)
-    waterHeight = tankHeight;
-
-  float percentage = (waterHeight / tankHeight) * 100.0;
-
-  Serial.println("----------------------");
-  Serial.print("Distance : ");
-  Serial.print(distance);
-  Serial.println(" cm");
-
-  Serial.print("Water Height : ");
-  Serial.print(waterHeight);
-  Serial.println(" cm");
-
-  Serial.print("Level : ");
-  Serial.print(percentage);
-  Serial.println(" %");
-
-  if (percentage >= 80) {
-
-    digitalWrite(greenLED, HIGH);
-    digitalWrite(redLED, LOW);
-
-  } else if (percentage <= 30) {
-
-    digitalWrite(greenLED, LOW);
-    digitalWrite(redLED, HIGH);
-
-  } else {
-
-    digitalWrite(greenLED, LOW);
-    digitalWrite(redLED, LOW);
-  }
-
-  delay(1000);
-}
+      - name: Compile Sketch
+        run: |
+          arduino-cli compile \
+            --fqbn esp32:esp32:esp32s3 \
+            .
