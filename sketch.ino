@@ -1,74 +1,37 @@
-const int trigPin = 4;
-const int echoPin = 5;
-
-const int greenLED = 18;
-const int redLED = 7;
-
-const float tankHeight = 9.0;   // cm
+#define TRIG_PIN 5
+#define ECHO_PIN 6
 
 void setup() {
-
   Serial.begin(115200);
 
-  pinMode(trigPin, OUTPUT);
-  pinMode(echoPin, INPUT);
+  pinMode(TRIG_PIN, OUTPUT);
+  pinMode(ECHO_PIN, INPUT);
 
-  pinMode(greenLED, OUTPUT);
-  pinMode(redLED, OUTPUT);
+  digitalWrite(TRIG_PIN, LOW);
+  delay(500);
 }
 
 void loop() {
+  digitalWrite(TRIG_PIN, LOW);
+  delayMicroseconds(3);
 
-  digitalWrite(trigPin, LOW);
-  delayMicroseconds(2);
-
-  digitalWrite(trigPin, HIGH);
+  digitalWrite(TRIG_PIN, HIGH);
   delayMicroseconds(10);
+  digitalWrite(TRIG_PIN, LOW);
 
-  digitalWrite(trigPin, LOW);
+  unsigned long duration = pulseIn(ECHO_PIN, HIGH, 30000);
 
-  long duration = pulseIn(echoPin, HIGH);
-
-  float distance = duration * 0.0343 / 2.0;
-
-  float waterHeight = tankHeight - distance;
-
-  if (waterHeight < 0)
-    waterHeight = 0;
-
-  if (waterHeight > tankHeight)
-    waterHeight = tankHeight;
-
-  float percentage = (waterHeight / tankHeight) * 100.0;
-
-  Serial.println("----------------------");
-  Serial.print("Distance : ");
-  Serial.print(distance);
-  Serial.println(" cm");
-
-  Serial.print("Water Height : ");
-  Serial.print(waterHeight);
-  Serial.println(" cm");
-
-  Serial.print("Level : ");
-  Serial.print(percentage);
-  Serial.println(" %");
-
-  if (percentage >= 80) {
-
-    digitalWrite(greenLED, HIGH);
-    digitalWrite(redLED, LOW);
-
-  } else if (percentage <= 30) {
-
-    digitalWrite(greenLED, LOW);
-    digitalWrite(redLED, HIGH);
-
+  if (duration == 0) {
+    Serial.println("NO ECHO");
   } else {
+    float distance = duration * 0.0343 / 2.0;
 
-    digitalWrite(greenLED, LOW);
-    digitalWrite(redLED, LOW);
+    Serial.print("Duration: ");
+    Serial.print(duration);
+    Serial.print(" us | Distance: ");
+    Serial.print(distance);
+    Serial.println(" cm");
   }
 
-  delay(1000);
+  delay(200);
 }
