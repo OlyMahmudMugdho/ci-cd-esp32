@@ -1,5 +1,5 @@
-#define TRIG_PIN 5
-#define ECHO_PIN 6
+#define TRIG_PIN 12
+#define ECHO_PIN 13
 
 const unsigned long ECHO_TIMEOUT_US = 30000;
 
